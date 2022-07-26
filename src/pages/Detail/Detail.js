@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
+import axios from "axios";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
-import "./add.scss";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import "../Add/add.scss";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
 const schema = yup.object({
     username: yup.string().required("Bắt buộc"),
@@ -22,23 +22,40 @@ const schema = yup.object({
         .required("Please select your gender")
         .oneOf(["male", "female"], "You can only select male or female"),
 });
-const AddNewStudent = ({
-    setShow = "",
-    setNewData = "",
-    dataDetail = "",
-    deletePost = "",
-}) => {
+const Detail = () => {
+    let { id } = useParams();
+    let navigate = useNavigate();
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        axios
+            .get(`https://prod.example.fafu.com.vn/employee/${id}`)
+            .then((response) => {
+                setData(response.data);
+            });
+    }, []);
+    const deletePost = () => {
+        axios
+            .delete(`http://prod.example.fafu.com.vn/employee/${id}`)
+            .then((response) => {
+                setData(response.data);
+            })
+            .catch(function (errors) {
+                console.log(errors);
+            });
+        navigate("/");
+    };
+
     const {
         register,
         handleSubmit,
-        formState: { errors, isValid },
+        formState: { errors, isValid},
         reset,
     } = useForm({
         resolver: yupResolver(schema),
         mode: "onChange",
     });
     const onSubmitHandler = (values, e) => {
-        e.preventDefault();
         // console.log("isValid",isValid);
         const newValue = {
             ...values,
@@ -49,7 +66,7 @@ const AddNewStudent = ({
         console.log(isValid);
         if (!isValid) return;
         axios
-            .post(`https://prod.example.fafu.com.vn/employee`, {
+            .put(`http://prod.example.fafu.com.vn/employee/${id}?`, {
                 username: newValue.username,
                 firstname: newValue.firstname,
                 lastname: newValue.lastname,
@@ -76,12 +93,14 @@ const AddNewStudent = ({
             phone: "",
             gender: "",
         });
-        setShow(false);
-        setNewData(newValue);
     };
 
+    
+
+
+
     return (
-        <div className="overlay">
+        <div>
             <div className="login login-content">
                 <form onSubmit={handleSubmit(onSubmitHandler)} className="row ">
                     <div className="login-group">
@@ -91,7 +110,7 @@ const AddNewStudent = ({
                             className="login-input"
                             placeholder="Type your username"
                             name="username"
-                            defaultValue={dataDetail&& dataDetail.username ? `${dataDetail.username}`: ''}
+                            defaultValue={data.username}
                             {...register("username")}
                         />
                         {errors?.username && (
@@ -106,7 +125,7 @@ const AddNewStudent = ({
                             type="text"
                             className="login-input"
                             name="lastname"
-                            defaultValue={dataDetail && dataDetail.lastname? `${dataDetail.lastname}`: ''}
+                            defaultValue={data && data.lastname? `${data.lastname}`: ''}
                             {...register("lastname")}
                         />
                         {errors?.lastname && (
@@ -121,7 +140,7 @@ const AddNewStudent = ({
                             type="text"
                             className="login-input"
                             name="firstname"
-                            defaultValue={dataDetail.firstname? `${dataDetail.firstname}`: ''}
+                            defaultValue={data.firstname&& `${data.firstname}`}
                             {...register("firstname")}
                         />
                         {errors?.firstname && (
@@ -136,7 +155,7 @@ const AddNewStudent = ({
                             type="email"
                             className="login-input"
                             name="email"
-                            defaultValue={dataDetail.email? `${dataDetail.email}`: ''}
+                            defaultValue={data.email? `${data.email}`: ''}
                             {...register("email")}
                         />
                         {errors?.email && (
@@ -151,7 +170,7 @@ const AddNewStudent = ({
                             type="text"
                             className="login-input"
                             name="phone"
-                            defaultValue={dataDetail.phone? `${dataDetail.phone}`: ''}
+                            defaultValue={data.phone? `${data.phone}`: ''}
                             {...register("phone")}
                         />
                         {errors?.phone && (
@@ -166,7 +185,7 @@ const AddNewStudent = ({
                             type="text"
                             className="login-input"
                             name="address"
-                            defaultValue={dataDetail.address? `${dataDetail.address}`: ''}
+                            defaultValue={data.address? `${data.address}`: ''}
                             {...register("address")}
                         />
                         {errors?.address && (
@@ -182,7 +201,7 @@ const AddNewStudent = ({
                             className="login-input"
                             name="birthday"
                             
-                            defaultValue={dataDetail.birthday?  `${new Date(dataDetail.birthday)}` : ''}
+                            defaultValue={data.birthday?  `${new Date(data.birthday)}` : ''}
                             {...register("birthday")}
                         />
                         {errors?.birthday && (
@@ -199,7 +218,7 @@ const AddNewStudent = ({
                                 name="gender"
                                 value="male"
                                
-                                checked={dataDetail.gender && dataDetail.gender===1? true: null}
+                                checked={data.gender && data.gender===1? true: null}
                                 {...register("gender")}
                             />
                             <span>Nam</span>
@@ -207,7 +226,7 @@ const AddNewStudent = ({
                                 type="radio"
                                 name="gender"
                                 value="female"
-                                checked={dataDetail.gender && dataDetail.gender===0? true: null}
+                                checked={data.gender && data.gender===0? true: null}
                                 {...register("gender")}
                             />
                             <span>Nữ</span>
@@ -218,25 +237,24 @@ const AddNewStudent = ({
                             </p>
                         )}
                     </div>
-                  
+                    {data && (
                         <>
-                            <button type="submit" className="login-button me-4">
-                                Tạo
-                            </button>
                             <button
-                                onClick={() => setShow(false)}
-                                className="login-button"
+                                className="login-button me-4"
+                                onClick={() => {
+                                    navigate("/");
+                                }}
                             >
                                 Đóng
                             </button>
+                            <button className="login-button me-4" onClick={deletePost}>Xóa</button>
+                            <button className="login-button me-4" type="submit" >Cập nhật</button>
                         </>
-              
-                    
+                    )}
                 </form>
             </div>
         </div>
     );
 };
 
-export default AddNewStudent;
-
+export default Detail;
