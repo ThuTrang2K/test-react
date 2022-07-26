@@ -26,7 +26,7 @@ const AddNewStudent = ({
     setShow = "",
     setNewData = "",
     dataDetail = "",
-    deletePost = "",
+    setCurrentPage = "",
 }) => {
     const {
         register,
@@ -76,8 +76,9 @@ const AddNewStudent = ({
             phone: "",
             gender: "",
         });
-        setShow(false);
         setNewData(newValue);
+        setCurrentPage(1);
+        setShow(false);
     };
 
     return (

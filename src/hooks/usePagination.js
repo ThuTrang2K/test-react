@@ -3,18 +3,20 @@ import { useEffect, useRef, useState } from "react";
 export default function usePagination({data,setData}){
     
     const item = Number(window.localStorage.getItem("currentPage"));
-    console.log("item",item);
-    const [currentPage, setCurrentPage] = useState(item ? item : 1);
+    const [currentPage, setCurrentPage] = useState(item? item: 1);
 
-    useEffect(()=>{
-        window.localStorage.setItem("currentPage", `${currentPage}`);
-    },[currentPage])
-
+    
     const [itemsPerPage, setItemsPerPage] = useState(3);
-
+    
     const [pageNumberLimit, setPageNumberLimit]= useState(2);
     const [maxPageNumberLimit, setMaxPageNumberLimit]= useState(2);
     const [minPageNumberLimit, setMinPageNumberLimit]= useState(0);
+    useEffect(()=>{
+        window.localStorage.setItem("currentPage", `${currentPage}`);
+        setMaxPageNumberLimit(currentPage+1)
+        setMinPageNumberLimit(currentPage-1)
+    },[currentPage])
+
     const handleClick =(e)=>{
         setCurrentPage(Number(e.target.id))
     }
@@ -27,7 +29,8 @@ export default function usePagination({data,setData}){
     const currentItems = data.slice(indexOfFirstItem, indexOfLastItem)
     
     const renderPageNumbers = pages.map((number) => {
-        if(number< maxPageNumberLimit+1 &&number> minPageNumberLimit){
+        // console.log(maxPageNumberLimit,minPageNumberLimit);
+        if(number< maxPageNumberLimit+1 && number> minPageNumberLimit){
             return (
                 <li className="page-item ">
                     <a className={`page-link ${currentPage === number ? "active":''}`} key={number} id={number}  onClick={handleClick}>
@@ -76,6 +79,6 @@ export default function usePagination({data,setData}){
 
     
     return{
-        currentItems, handlePrevBtn, currentPage,pageDecrementBtn,renderPageNumbers,pageIncrementBtn,handleNextBtn,pages
+        setCurrentPage,currentItems, handlePrevBtn, currentPage,pageDecrementBtn,renderPageNumbers,pageIncrementBtn,handleNextBtn,pages
     }
 }

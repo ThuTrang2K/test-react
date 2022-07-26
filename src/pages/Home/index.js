@@ -15,6 +15,7 @@ const Home = () => {
     }, [newdata]);
 
     const {
+        setCurrentPage,
         currentItems,
         handlePrevBtn,
         currentPage,
@@ -32,7 +33,7 @@ const Home = () => {
                 <button onClick={() => setShow(true)}>Tạo mới</button>
             </div>
             {show && (
-                <AddNewStudent setShow={setShow} setNewData={setNewData} />
+                <AddNewStudent setCurrentPage={setCurrentPage} setShow={setShow} setNewData={setNewData} />
             )}
 
             <table>

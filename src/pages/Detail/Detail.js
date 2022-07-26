@@ -23,33 +23,10 @@ const schema = yup.object({
         .oneOf(["male", "female"], "You can only select male or female"),
 });
 const Detail = () => {
-    let { id } = useParams();
-    let navigate = useNavigate();
-    const [data, setData] = useState([]);
-
-    useEffect(() => {
-        axios
-            .get(`https://prod.example.fafu.com.vn/employee/${id}`)
-            .then((response) => {
-                setData(response.data);
-            });
-    }, []);
-    const deletePost = () => {
-        axios
-            .delete(`http://prod.example.fafu.com.vn/employee/${id}`)
-            .then((response) => {
-                setData(response.data);
-            })
-            .catch(function (errors) {
-                console.log(errors);
-            });
-        navigate("/");
-    };
-
     const {
         register,
         handleSubmit,
-        formState: { errors, isValid},
+        formState: { errors, isValid },
         reset,
     } = useForm({
         resolver: yupResolver(schema),
@@ -95,7 +72,28 @@ const Detail = () => {
         });
     };
 
-    
+    let { id } = useParams();
+    let navigate = useNavigate();
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        axios
+            .get(`https://prod.example.fafu.com.vn/employee/${id}`)
+            .then((response) => {
+                setData(response.data);
+            });
+    }, []);
+    const deletePost = () => {
+        axios
+            .delete(`http://prod.example.fafu.com.vn/employee/${id}`)
+            .then((response) => {
+                setData(response.data);
+            })
+            .catch(function (errors) {
+                console.log(errors);
+            });
+        navigate("/");
+    };
 
 
 
@@ -110,7 +108,7 @@ const Detail = () => {
                             className="login-input"
                             placeholder="Type your username"
                             name="username"
-                            defaultValue={data.username}
+                            defaultValue={data&& data.username ? `${data.username}`: ''}
                             {...register("username")}
                         />
                         {errors?.username && (

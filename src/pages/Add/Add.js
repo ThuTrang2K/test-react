@@ -1,9 +1,8 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import axios from 'axios';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
-import "./add.scss";
 
 const schemaValidation = Yup.object({
     firstName: Yup.string()
@@ -12,7 +11,21 @@ const schemaValidation = Yup.object({
   });
 
 const Add = () => {
-    const {register, handleSubmit, reset, formState:{errors,isValid}}= useForm({resolver: yupResolver(schemaValidation), mode:"onChange"});
+  const [data ,setData]=useState([])
+
+  useEffect(() => {
+    async function fetchData(){
+      await axios
+        .get(`https://prod.example.fafu.com.vn/employee/24`)
+        .then((response) => {
+            setData(response.data);
+        });
+    }
+    fetchData();
+}, []);
+
+
+    const {register, handleSubmit, reset, formState:{errors,isValid}}= useForm({resolver: yupResolver(schemaValidation), mode:"onChange", defaultValues:{}});
     const onSubmit = async (values) =>{
       console.log("isValid",isValid);
         if(isValid) {
@@ -24,25 +37,30 @@ const Add = () => {
             })
         }
 
-        console.log(values);
+        console.log("values",values);
     } 
     return (
-       <div className="overlay">
-         <form onSubmit={handleSubmit(onSubmit)}
-      className="row login-container"
+        <form onSubmit={handleSubmit(onSubmit)}
+      className="p-10 w-full max-w-[500px] mx-auto"
       autoComplete="off"
     >
-      <div className="login-group">
+      <div className="flex flex-col gap-2 mb-5">
         <label htmlFor="firstName">Firstname</label>
         <input
           type="text"
           id="firstName"
           placeholder="Enter your first name"
-          className="login-input"
+          className="p-4 rounded-md border border-gray-100"
+         defaultValue={data&& data.username ? `${data.username}`: ''}
+        //  {...register("firstName",{required:true,maxLength:10, 
+        //     pattern: reget
+        //  })}
         {...register("firstName")}
         />
+        {/* {errors?.firstName?.type ==="required" && <div className='text-red-500 text-sm'>Please fill out this field</div>}
+        {errors?.firstName?.type ==="maxLength" && <div className='text-red-500 text-sm'>Must be 10 character or less</div>} */}
         {errors?.firstName && (
-          <div className="text-danger">
+          <div className="text-red-500 text-sm">
             {errors.firstName?.message}
           </div>
         )}
@@ -55,11 +73,11 @@ const Add = () => {
           id="lastName"
           placeholder="Enter your first name"
           className="p-4 rounded-md border border-gray-100"
+          defaultValue={data && data.lastname? `${data.lastname}`: ''}
           {...register("lastName")}
         />
        
       </div>
-      <div className="login-content">
       <div>
         <button
           type="submit"
@@ -68,9 +86,7 @@ const Add = () => {
           Submit
         </button>
       </div>
-      </div>
     </form>
-       </div>
     );
 };
 
