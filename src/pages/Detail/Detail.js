@@ -10,16 +10,13 @@ const schema = yup.object({
     username: yup.string().required("Bắt buộc"),
     firstname: yup.string().required("Bắt buộc"),
     lastname: yup.string().required("Bắt buộc"),
-    address: yup.string().required("Bắt buộc"),
+    address: yup.string(),
     birthday: yup.date().required("Bắt buộc"),
-    email: yup
-        .string()
-        .email("Please enter valid email address")
-        .required("Please enter your email address"),
+    email: yup.string().email("Không hợp lệ").required("Bắt buộc"),
     phone: yup.string().min(10).required("Bắt buộc"),
     gender: yup
         .string()
-        .required("Please select your gender")
+        .required("Bắt buộc")
         .oneOf(["male", "female"], "You can only select male or female"),
 });
 const Detail = () => {
@@ -33,14 +30,16 @@ const Detail = () => {
         mode: "onChange",
     });
     const onSubmitHandler = (values, e) => {
-        // console.log("isValid",isValid);
+        const date = `${values.birthday}`;
         const newValue = {
             ...values,
             gender: values.gender === "male" ? 1 : 0,
-            birthday: new Date(values.birthday).toISOString(),
+            birthday: new Date(
+                date.replace(/GMT.*$/, "GMT+0000")
+            ).toISOString(),
         };
         console.log(newValue);
-        console.log(isValid);
+        console.log("bi", newValue.birthday);
         if (!isValid) return;
         axios
             .put(`http://prod.example.fafu.com.vn/employee/${id}?`, {
@@ -70,6 +69,7 @@ const Detail = () => {
             phone: "",
             gender: "",
         });
+        navigate("/");
     };
 
     let { id } = useParams();
@@ -80,22 +80,33 @@ const Detail = () => {
         axios
             .get(`https://prod.example.fafu.com.vn/employee/${id}`)
             .then((response) => {
-                setData(response.data);
+                const data = response.data;
+                data.gender = data.gender === 1 ? "male" : "female";
+                console.log("bitrh1", data.birthday);
+                data.birthday = new Date(data.birthday)
+                    .toISOString()
+                    .slice(0, 10);
+                console.log("bitrh2", data.birthday);
+                setData(data);
             });
     }, []);
+    useEffect(() => {
+        reset(data);
+    }, [data]);
     const deletePost = () => {
-        axios
-            .delete(`http://prod.example.fafu.com.vn/employee/${id}`)
-            .then((response) => {
-                setData(response.data);
-            })
-            .catch(function (errors) {
-                console.log(errors);
-            });
+        if (window.confirm("Bạn có đồng ý xóa") === true) {
+            axios
+                .delete(`http://prod.example.fafu.com.vn/employee/${id}`)
+                .then((response) => {
+                    setData(response.data);
+                })
+                .catch(function (errors) {
+                    console.log(errors);
+                });
+        }
+
         navigate("/");
     };
-
-
 
     return (
         <div>
@@ -108,7 +119,7 @@ const Detail = () => {
                             className="login-input"
                             placeholder="Type your username"
                             name="username"
-                            defaultValue={data&& data.username ? `${data.username}`: ''}
+                            // defaultValue={data&& data.username ? `${data.username}`: ''}
                             {...register("username")}
                         />
                         {errors?.username && (
@@ -123,7 +134,7 @@ const Detail = () => {
                             type="text"
                             className="login-input"
                             name="lastname"
-                            defaultValue={data && data.lastname? `${data.lastname}`: ''}
+                            // defaultValue={data && data.lastname? `${data.lastname}`: ''}
                             {...register("lastname")}
                         />
                         {errors?.lastname && (
@@ -138,7 +149,7 @@ const Detail = () => {
                             type="text"
                             className="login-input"
                             name="firstname"
-                            defaultValue={data.firstname&& `${data.firstname}`}
+                            // defaultValue={data.firstname&& `${data.firstname}`}
                             {...register("firstname")}
                         />
                         {errors?.firstname && (
@@ -153,7 +164,7 @@ const Detail = () => {
                             type="email"
                             className="login-input"
                             name="email"
-                            defaultValue={data.email? `${data.email}`: ''}
+                            // defaultValue={data.email? `${data.email}`: ''}
                             {...register("email")}
                         />
                         {errors?.email && (
@@ -168,7 +179,7 @@ const Detail = () => {
                             type="text"
                             className="login-input"
                             name="phone"
-                            defaultValue={data.phone? `${data.phone}`: ''}
+                            // defaultValue={data.phone? `${data.phone}`: ''}
                             {...register("phone")}
                         />
                         {errors?.phone && (
@@ -178,12 +189,13 @@ const Detail = () => {
                         )}
                     </div>
                     <div className="login-group">
-                        <label htmlFor="">Địa chỉ(*):</label>
+                        <label htmlFor="">Địa chỉ:</label>
                         <input
                             type="text"
+                            s
                             className="login-input"
                             name="address"
-                            defaultValue={data.address? `${data.address}`: ''}
+                            // defaultValue={data.address? `${data.address}`: ''}
                             {...register("address")}
                         />
                         {errors?.address && (
@@ -198,8 +210,8 @@ const Detail = () => {
                             type="date"
                             className="login-input"
                             name="birthday"
-                            
-                            defaultValue={data.birthday?  `${new Date(data.birthday)}` : ''}
+                            // defaultValue={data.birthday? new Date(data.birthday) : ''}
+
                             {...register("birthday")}
                         />
                         {errors?.birthday && (
@@ -215,8 +227,7 @@ const Detail = () => {
                                 type="radio"
                                 name="gender"
                                 value="male"
-                               
-                                checked={data.gender && data.gender===1? true: null}
+                                checked={data?.gender === 1 ? true : null}
                                 {...register("gender")}
                             />
                             <span>Nam</span>
@@ -224,7 +235,7 @@ const Detail = () => {
                                 type="radio"
                                 name="gender"
                                 value="female"
-                                checked={data.gender && data.gender===0? true: null}
+                                checked={data?.gender === 0 ? true : null}
                                 {...register("gender")}
                             />
                             <span>Nữ</span>
@@ -245,8 +256,15 @@ const Detail = () => {
                             >
                                 Đóng
                             </button>
-                            <button className="login-button me-4" onClick={deletePost}>Xóa</button>
-                            <button className="login-button me-4" type="submit" >Cập nhật</button>
+                            <button
+                                className="login-button me-4"
+                                onClick={deletePost}
+                            >
+                                Xóa
+                            </button>
+                            <button className="login-button me-4" type="submit">
+                                Cập nhật
+                            </button>
                         </>
                     )}
                 </form>

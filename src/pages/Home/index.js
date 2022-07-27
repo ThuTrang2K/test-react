@@ -1,18 +1,19 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect,  useReducer,  useState } from "react";
 import "./home.scss";
 import AddNewStudent from "../Add/AddNewStudent";
 import usePagination from "../../hooks/usePagination";
-import Add from "../Add/Add";
 import { Link } from "react-router-dom";
 
 const Home = () => {
     const [data, setData] = useState([]);
-    const [newdata, setNewData] = useState([]);
-    useEffect(() => {
+    const [reducerValue, forceUpdate] = useReducer(x => x + 1, 0);
+    console.log("re");
+     useEffect(() => {
+        console.log("loading");
         fetch(`https://prod.example.fafu.com.vn/employee?page=0&size=10`)
             .then((response) => response.json())
             .then((json) => setData(json.data));
-    }, [newdata]);
+    }, [reducerValue]);
 
     const {
         setCurrentPage,
@@ -26,6 +27,7 @@ const Home = () => {
         pages,
     } = usePagination({ data, setData });
     const [show, setShow] = useState(false);
+
     return (
         <div className="container-fluid p-5">
             <div className="d-flex justify-content-between ">
@@ -33,7 +35,11 @@ const Home = () => {
                 <button onClick={() => setShow(true)}>Tạo mới</button>
             </div>
             {show && (
-                <AddNewStudent setCurrentPage={setCurrentPage} setShow={setShow} setNewData={setNewData} />
+                <AddNewStudent
+                    setCurrentPage={setCurrentPage}
+                    setShow={setShow}
+                    forceUpdate={forceUpdate}
+                />
             )}
 
             <table>
@@ -66,16 +72,31 @@ const Home = () => {
                                             className="link-detail"
                                             to={`/student/${item.id}`}
                                         >
-                                            {item.lastname ?item.lastname :"Rỗng" } {item.firstname} 
+                                            {item.lastname
+                                                ? item.lastname
+                                                : "Rỗng"}{" "}
+                                            {item.firstname}
                                         </Link>
                                     </td>
-                                    <td>{item.email}</td>
-                                    <td>{item.phone}</td>
+                                    <td>
+                                        <Link
+                                            className="link-detail"
+                                            to={`/student/${item.id}`}
+                                        >
+                                            {item.email}
+                                        </Link>
+                                    </td>
+                                    <td>
+                                        <Link
+                                            className="link-detail"
+                                            to={`/student/${item.id}`}
+                                        >
+                                            {item.phone}
+                                        </Link>
+                                    </td>
                                 </tr>
                             );
                         })}
-                    {/* {isLoading === true && <tr>isLoading...</tr>}
-                    {isError === true && <tr>something wrong...</tr>} */}
                 </tbody>
             </table>
             <div className="mt-5 text-center">
