@@ -1,7 +1,13 @@
+.container {
+  width: 1000px;
+  max-width: 100%;
+  margin-top: 50px;
+}
+
 table {
     font-family: arial, sans-serif;
     border-collapse: collapse;
-    width: 80%;
+    width: 100%;
     margin: 20px auto 0;
   }
   
@@ -25,4 +31,26 @@ table {
 .link-detail {
   text-decoration: none;
   color: black;
+}
+
+.table {
+  margin-top: 40px;
+  height: 350px;
+}
+
+.add-btn {
+  cursor: pointer;
+  border: 2px solid transparent;
+  background-color:#0d6efd ;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+  transition: all .2s linear;
+}
+
+.add-btn:hover {
+  border-color: #0d6efd;
+  background-color: #fff;
+  color: #0d6efd;
 }
