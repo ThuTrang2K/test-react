@@ -15,6 +15,8 @@ function App() {
                         path="/student/:id"
                         element={<Detail />}
                     ></Route>
+                   
+                    
                 </Routes>
                 
             </div>

@@ -1,36 +1,72 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useState } from "react";
+
 import "./home.scss";
-import AddNewStudent from "../Add/AddNewStudent";
+
 import usePagination from "../../hooks/usePagination";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import "antd/dist/antd.css";
+import axios from "axios";
+import { Button, Radio, Table } from "antd";
+import Add from "../Add/Add";
+
+const queryString = require("query-string");
 
 const Home = () => {
-    const [data, setData] = useState([]);
-    const [reducerValue, forceUpdate] = useReducer((x) => x + 1, 0);
-    console.log("re");
-    useEffect(() => {
-        const fetchData = async () => {
-            const response = await fetch(
-                `https://prod.example.fafu.com.vn/employee?page=0&size=10`
-            );
-            const json = await response.json();
-            setData(json.data);
-        };
-        fetchData().catch(console.error);
-    }, [reducerValue]);
-
-    const {
-        setCurrentPage,
-        currentItems,
-        handlePrevBtn,
-        currentPage,
-        pageDecrementBtn,
-        renderPageNumbers,
-        pageIncrementBtn,
-        handleNextBtn,
-        pages,
-    } = usePagination({ data, setData });
+    const [result, setResult] = useState([]);
+    const [page, setPage] = useState(0);
     const [show, setShow] = useState(false);
+    useEffect(() => {
+        getStudents();
+    }, [page]);
+    const getStudents = async () => {
+        const response = await axios.get(
+            `https://prod.example.fafu.com.vn/employee?page=${page}&size=10`
+        );
+        if (response.status === 200) {
+            setResult(response.data);
+        }
+    };
+    const data = result.data;
+    const total_page = result.total_page;
+    
+     console.log('param',Location.search);
+    const columns = [
+        {
+            dataIndex: "id",
+        },
+        {
+            title: "Tên đăng nhập",
+            dataIndex: "username",
+            key: "id",
+            render: (text, record) => (
+                <Link to={`/student/${record.id}`}>{text || "Rỗng"}</Link>
+            ),
+        },
+        {
+            title: "Họ",
+            dataIndex: "lastname",
+            key: "lastname",
+        },
+        {
+            title: "Tên",
+            dataIndex: "firstname",
+            key: "firstname",
+        },
+        {
+            title: "Email",
+            dataIndex: "email",
+            key: "email",
+        },
+        {
+            title: "Điện thoại",
+            dataIndex: "phone",
+            key: "phone",
+        },
+    ];
+    function handleClose() {
+        setShow(false);
+        getStudents();
+    }
 
     return (
         <div className="container ">
@@ -40,92 +76,33 @@ const Home = () => {
                     Tạo mới
                 </button>
             </div>
-            {show && (
-                <AddNewStudent
-                    setCurrentPage={setCurrentPage}
-                    setShow={setShow}
-                    forceUpdate={forceUpdate}
-                />
-            )}
-
-            <div className="table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Tên đăng nhập</th>
-                            <th>Họ tên</th>
-                            <th>Email</th>
-                            <th>Điện thoại</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {currentItems &&
-                            currentItems.length > 0 &&
-                            currentItems.map((item) => {
-                                return (
-                                    <tr key={item.id}>
-                                        <td>
-                                            <Link
-                                                className="link-detail"
-                                                to={`/student/${item.id}`}
-                                            >
-                                                {item.username}
-                                            </Link>
-                                        </td>
-                                        <td>
-                                            <Link
-                                                className="link-detail"
-                                                to={`/student/${item.id}`}
-                                            >
-                                                {item.lastname
-                                                    ? item.lastname
-                                                    : "Rỗng"}{" "}
-                                                {item.firstname}
-                                            </Link>
-                                        </td>
-                                        <td>
-                                            <Link
-                                                className="link-detail"
-                                                to={`/student/${item.id}`}
-                                            >
-                                                {item.email}
-                                            </Link>
-                                        </td>
-                                        <td>
-                                            <Link
-                                                className="link-detail"
-                                                to={`/student/${item.id}`}
-                                            >
-                                                {item.phone}
-                                            </Link>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                    </tbody>
-                </table>
-            </div>
+            {show && <Add handleClose={handleClose} />}
+            <Table columns={columns} dataSource={data} />
             <div className="mt-5 text-center">
                 <nav aria-label="Page navigation example d-inline ">
                     <ul className="pagination justify-content-center">
                         <button
                             className="page-link"
-                            onClick={handlePrevBtn}
-                            disabled={currentPage === pages[0] ? true : false}
+                            onClick={() => setPage(page - 1)}
+                            disabled={page === 0 ? true : false}
                         >
                             Previous
                         </button>
-                        {pageDecrementBtn}
-                        {renderPageNumbers}
-                        {pageIncrementBtn}
+                        {new Array(total_page).fill(0).map((item, index) => (
+                            <Link
+                                to={`/?page=${page}`}
+                                class={`page-link ${
+                                    page === index ? "active" : ""
+                                }`}
+                                onClick={() => setPage(index)}
+                            >
+                                {index + 1}
+                            </Link>
+                        ))}
                         <button
                             className="page-link"
-                            onClick={handleNextBtn}
-                            disabled={
-                                currentPage === pages[pages.length - 1]
-                                    ? true
-                                    : false
-                            }
+                            onClick={() => setPage(page + 1)}
+                            disabled={page === total_page - 1 ? true : false}
                         >
                             Next{" "}
                         </button>
