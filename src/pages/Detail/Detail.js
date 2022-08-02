@@ -40,7 +40,7 @@ const Detail = () => {
         const response = await axios.delete(
             `https://prod.example.fafu.com.vn/employee/${id}`
         );
-        setTimeout(() => navigate("/"), 500);
+        setTimeout(() => navigate(-1), 500);
     };
 
     const EditStudent = async (data) => {
@@ -76,7 +76,7 @@ const Detail = () => {
         };
         console.log("value", values);
         EditStudent(values);
-        setTimeout(() => navigate("/"), 500);
+        setTimeout(() => navigate(-1), 500);
     };
 
     const onFinishFailed = (errorInfo) => {
@@ -208,7 +208,7 @@ const Detail = () => {
                     <Button className="mx-2" onClick={handleDelete}>
                         Xóa
                     </Button>
-                    <Button onClick={()=>( navigate("/"))}>
+                    <Button onClick={() => navigate(-1)}>
                         Đóng
                     </Button>
                 </Form.Item>

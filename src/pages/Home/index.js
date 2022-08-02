@@ -3,24 +3,33 @@ import React, { useEffect, useState } from "react";
 import "./home.scss";
 
 import usePagination from "../../hooks/usePagination";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
+import { useSearchParams } from 'react-router-dom';
 import "antd/dist/antd.css";
 import axios from "axios";
 import { Button, Radio, Table } from "antd";
 import Add from "../Add/Add";
 
-const queryString = require("query-string");
+import queryString from "query-string";
 
 const Home = () => {
     const [result, setResult] = useState([]);
-    const [page, setPage] = useState(0);
     const [show, setShow] = useState(false);
+    
+    const {search} = useLocation();
+    let {page} =  queryString.parse(search);
+
+    const [curentPage, setCurentPage] = useState(Number(page)|| 0);
+    const [searchParams, setSearchParams] = useSearchParams();
+   
+    console.log('param',page);
+
     useEffect(() => {
-        getStudents();
-    }, [page]);
-    const getStudents = async () => {
+        getStudents(curentPage);
+    }, [curentPage]);
+    const getStudents = async (curentPage =0) => {
         const response = await axios.get(
-            `https://prod.example.fafu.com.vn/employee?page=${page}&size=10`
+            `https://prod.example.fafu.com.vn/employee?page=${curentPage}&size=10`
         );
         if (response.status === 200) {
             setResult(response.data);
@@ -28,8 +37,9 @@ const Home = () => {
     };
     const data = result.data;
     const total_page = result.total_page;
+
     
-     console.log('param',Location.search);
+
     const columns = [
         {
             dataIndex: "id",
@@ -64,8 +74,10 @@ const Home = () => {
         },
     ];
     function handleClose() {
-        setShow(false);
+        setCurentPage(0);
+        setSearchParams({page: curentPage})
         getStudents();
+        setShow(false);
     }
 
     return (
@@ -78,31 +90,37 @@ const Home = () => {
             </div>
             {show && <Add handleClose={handleClose} />}
             <Table columns={columns} dataSource={data} />
-            <div className="mt-5 text-center">
+            <div className="mt-5 mb-5 text-center">
                 <nav aria-label="Page navigation example d-inline ">
                     <ul className="pagination justify-content-center">
                         <button
                             className="page-link"
-                            onClick={() => setPage(page - 1)}
-                            disabled={page === 0 ? true : false}
+                            onClick={() => {
+                                setCurentPage(curentPage-1);
+                                setSearchParams({page: curentPage-1})}}
+                            disabled={curentPage === 0 ? true : false}
                         >
                             Previous
                         </button>
                         {new Array(total_page).fill(0).map((item, index) => (
-                            <Link
-                                to={`/?page=${page}`}
+                            <li
+                                
                                 class={`page-link ${
-                                    page === index ? "active" : ""
+                                    curentPage === index ? "active" : ""
                                 }`}
-                                onClick={() => setPage(index)}
+                                onClick={() => {
+                                    setCurentPage(index);
+                                    setSearchParams({page: index})}}
                             >
                                 {index + 1}
-                            </Link>
+                            </li>
                         ))}
                         <button
                             className="page-link"
-                            onClick={() => setPage(page + 1)}
-                            disabled={page === total_page - 1 ? true : false}
+                            onClick={() => {
+                                setCurentPage(curentPage+1);
+                                setSearchParams({page: curentPage+1})}}
+                            disabled={curentPage === total_page - 1 ? true : false}
                         >
                             Next{" "}
                         </button>

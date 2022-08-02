@@ -2,8 +2,12 @@
   width: 1000px;
   max-width: 100%;
   margin-top: 50px;
+  padding-bottom: 50px;
 }
 
+.ant-table-wrapper {
+  height: 625px;
+}
 table {
     font-family: arial, sans-serif;
     border-collapse: collapse;
