@@ -73,10 +73,9 @@ const Home = () => {
             key: "phone",
         },
     ];
-    function handleClose() {
+    const  handleClose= ()=>{
         setCurentPage(0);
         setSearchParams({page: curentPage})
-        getStudents();
         setShow(false);
     }
 
@@ -88,7 +87,7 @@ const Home = () => {
                     Tạo mới
                 </button>
             </div>
-            {show && <Add handleClose={handleClose} />}
+            {show && <Add handleClose={handleClose} getStudents={getStudents}/>}
             <Table columns={columns} dataSource={data} />
             <div className="mt-5 mb-5 text-center">
                 <nav aria-label="Page navigation example d-inline ">

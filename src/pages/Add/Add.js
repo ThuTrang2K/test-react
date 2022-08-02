@@ -4,7 +4,7 @@ import "antd/dist/antd.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const Add = ({ handleClose }) => {
+const Add = ({ handleClose,getStudents }) => {
     const AddStudent = async (data) => {
         const responce = await axios.post(
             `https://prod.example.fafu.com.vn/employee`,
@@ -19,6 +19,9 @@ const Add = ({ handleClose }) => {
                 gender: data.gender,
             }
         );
+        if(responce.status ===200){
+            getStudents();
+        }
     };
     const onFinish = (fieldsValue) => {
         const values = {
