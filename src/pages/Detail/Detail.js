@@ -4,43 +4,54 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button, Form, Input, DatePicker, Radio, Modal } from "antd";
 import moment from "moment";
+import {provider, useInstance} from "react-ioc"
+import { observer } from "mobx-react-lite";
+import UserDetailsViewStore from "../../store/UserDetailsViewStore";
 
-const Detail = () => {
-    const [data, setData] = useState([]);
+
+const Detail = provider(UserDetailsViewStore)(observer(() => {
+    const userDetailsStore = useInstance(UserDetailsViewStore)
+    const data = userDetailsStore.userDetail
+    console.log("hello",data);
+    // const [data, setData] = useState([]);
     let navigate = useNavigate();
     const { id } = useParams();
-    useEffect(() => {
-        if (id) {
-            getSingleStudent(id);
-        }
-    }, [id]);
-    const getSingleStudent = async (idStudent) => {
-        const response = await axios.get(
-            `https://prod.example.fafu.com.vn/employee/${idStudent}`
-        );
-        const result = response.data;
+    
 
-        result.gender = result.gender === 1 ? "male" : "female";
-        console.log("bitrh1", result.birthday);
-        result.birthday = new Date(result.birthday).toISOString().slice(0,10);
-        console.log("bitrh2", result.birthday);
-        setData(result);
-        form.setFieldsValue({
-            username: result.username,
-            firstname: result.firstname,
-            lastname: result.lastname,
-            address: result.address,
-            email: result.email,
-            birthday: moment(result.birthday, 'YYYY-MM-DD'),
-            phone: result.phone,
-            gender: result.gender,
-        });
-    };
-    const deleteStudent = async () => {
-        const response = await axios.delete(
-            `https://prod.example.fafu.com.vn/employee/${id}`
-        );
-        setTimeout(() => navigate(-1), 500);
+//     useEffect(() => {
+//         if (id) {
+//             getSingleStudent(id);
+//         }
+//     }, [id]);
+//     const getSingleStudent = async (idStudent) => {
+//         const response = await axios.get(
+//             `https://prod.example.fafu.com.vn/employee/${idStudent}`
+//         );
+//         const result = response.data;
+// 
+//         result.gender = result.gender === 1 ? "male" : "female";
+//         console.log("bitrh1", result.birthday);
+//         result.birthday = new Date(result.birthday).toISOString().slice(0,10);
+//         console.log("bitrh2", result.birthday);
+//         setData(result);
+//         form.setFieldsValue({
+//             username: result.username,
+//             firstname: result.firstname,
+//             lastname: result.lastname,
+//             address: result.address,
+//             email: result.email,
+//             birthday: moment(result.birthday, 'YYYY-MM-DD'),
+//             phone: result.phone,
+//             gender: result.gender,
+//         });
+//     };
+    const deleteStudent = () => {
+        // userDetailsStore.deleteUser;
+        // const response = await axios.delete(
+        //     `https://prod.example.fafu.com.vn/employee/${id}`
+        // );
+
+         setTimeout(() => navigate(-1), 500);
     };
 
     const EditStudent = async (data) => {
@@ -68,6 +79,18 @@ const Detail = () => {
         });
     };
     const [form] = Form.useForm();
+    {data &&
+        form.setFieldsValue({
+        username: data.username,
+        firstname: data.firstname,
+        lastname: data.lastname,
+        address: data.address,
+        email: data.email,
+        birthday: moment(data.birthday, 'YYYY-MM-DD'),
+        phone: data.phone,
+        gender: data.gender,
+    });
+}
     const onFinish = (fieldsValue) => {
         const values = {
             ...fieldsValue,
@@ -92,7 +115,6 @@ const Detail = () => {
             },
         ],
     };
-    console.log("data.username", data.username);
     if (!data) return null;
     return (
         <div className="edit-form ">
@@ -215,6 +237,6 @@ const Detail = () => {
             </Form>
         </div>
     );
-};
+}));
 
 export default Detail;

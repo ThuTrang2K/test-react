@@ -9,13 +9,17 @@ import "antd/dist/antd.css";
 import axios from "axios";
 import { Button, Radio, Table } from "antd";
 import Add from "../Add/Add";
+import {provider, useInstance} from "react-ioc"
 
 import queryString from "query-string";
+import UserModalViewStore from "../../store/UserModalViewStore";
+import {observer} from 'mobx-react-lite'
+import UserListViewStore from "../../store/UserListViewStore";
 
-const Home = () => {
-    const [result, setResult] = useState([]);
-    const [show, setShow] = useState(false);
-    
+const Home =provider(UserListViewStore)(observer(() => {
+    const modalStore = useInstance(UserModalViewStore);
+    const userStore = useInstance(UserListViewStore)
+    const [result, setResult] = useState([]);    
     const {search} = useLocation();
     let {page} =  queryString.parse(search);
 
@@ -24,9 +28,9 @@ const Home = () => {
    
     console.log('param',page);
 
-    useEffect(() => {
-        getStudents(curentPage);
-    }, [curentPage]);
+    // useEffect(() => {
+    //     getStudents(curentPage);
+    // }, [curentPage]);
     const getStudents = async (curentPage =0) => {
         const response = await axios.get(
             `https://prod.example.fafu.com.vn/employee?page=${curentPage}&size=10`
@@ -35,7 +39,7 @@ const Home = () => {
             setResult(response.data);
         }
     };
-    const data = result.data;
+    // const data = result.data;
     const total_page = result.total_page;
 
     
@@ -76,19 +80,20 @@ const Home = () => {
     const  handleClose= ()=>{
         setCurentPage(0);
         setSearchParams({page: curentPage})
-        setShow(false);
+        modalStore.close();
+        // setShow(false);
     }
 
     return (
         <div className="container ">
             <div className="d-flex justify-content-between ">
                 <h1>Hệ thống quản lý sinh viên</h1>
-                <button className="add-btn" onClick={() => setShow(true)}>
+                <button className="add-btn" onClick={modalStore.open}>
                     Tạo mới
                 </button>
             </div>
-            {show && <Add handleClose={handleClose} getStudents={getStudents}/>}
-            <Table columns={columns} dataSource={data} />
+            {modalStore.opened && <Add handleClose={handleClose} getStudents={getStudents}/>}
+            <Table columns={columns} dataSource={userStore.users} />
             <div className="mt-5 mb-5 text-center">
                 <nav aria-label="Page navigation example d-inline ">
                     <ul className="pagination justify-content-center">
@@ -128,6 +133,6 @@ const Home = () => {
             </div>
         </div>
     );
-};
+})) ;
 
 export default Home;
