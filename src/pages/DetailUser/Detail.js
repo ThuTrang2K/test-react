@@ -1,28 +1,24 @@
 import axios from "axios";
-import "../Add/add.scss";
-import React, { useEffect, useState } from "react";
+import "../AddUser/add.scss";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button, Form, Input, DatePicker, Radio, Modal } from "antd";
 import moment from "moment";
-import {provider, useInstance} from "react-ioc"
 import { observer } from "mobx-react-lite";
-import UserDetailsViewStore from "../../store/UserDetailsViewStore";
+import { StudentContext } from "../../context";
 
 
-const Detail = provider(UserDetailsViewStore)(observer(() => {
-    const userDetailsStore = useInstance(UserDetailsViewStore)
-    const data = userDetailsStore.userDetail
-    console.log("hello",data);
-    // const [data, setData] = useState([]);
+
+const Detail = observer(() => {
+    const {userDetailStore, userStore}= useContext(StudentContext)
     let navigate = useNavigate();
     const { id } = useParams();
-    
+    const data = userDetailStore.user
+    console.log("data",data);
 
-//     useEffect(() => {
-//         if (id) {
-//             getSingleStudent(id);
-//         }
-//     }, [id]);
+    useEffect(() => {
+        userDetailStore.getUserById(id);
+    }, [id]);
 //     const getSingleStudent = async (idStudent) => {
 //         const response = await axios.get(
 //             `https://prod.example.fafu.com.vn/employee/${idStudent}`
@@ -46,12 +42,8 @@ const Detail = provider(UserDetailsViewStore)(observer(() => {
 //         });
 //     };
     const deleteStudent = () => {
-        // userDetailsStore.deleteUser;
-        // const response = await axios.delete(
-        //     `https://prod.example.fafu.com.vn/employee/${id}`
-        // );
-
-         setTimeout(() => navigate(-1), 500);
+        userDetailStore.deleteUser(id)
+        setTimeout(() => navigate(-1), 500);
     };
 
     const EditStudent = async (data) => {
@@ -98,7 +90,7 @@ const Detail = provider(UserDetailsViewStore)(observer(() => {
             gender: fieldsValue["gender"] === "male" ? 1 : 0,
         };
         console.log("value", values);
-        EditStudent(values);
+        userDetailStore.UpdateUser(values,id)
         setTimeout(() => navigate(-1), 500);
     };
 
@@ -237,6 +229,6 @@ const Detail = provider(UserDetailsViewStore)(observer(() => {
             </Form>
         </div>
     );
-}));
+});
 
 export default Detail;

@@ -4,14 +4,15 @@ import "./index.scss";
 import App from "./App";
 import { BrowserRouter as Router } from "react-router-dom";
 import reportWebVitals from "./reportWebVitals";
+import { StudentProvider } from "./context";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-    <React.StrictMode>
-        <Router>
+    <Router>
+        <StudentProvider>
             <App />
-        </Router>
-    </React.StrictMode>
+        </StudentProvider>
+    </Router>
 );
 
 // If you want to start measuring performance in your app, pass a function

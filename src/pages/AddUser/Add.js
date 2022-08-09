@@ -1,28 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Button, Checkbox, Form, Input, DatePicker, Radio } from "antd";
 import "antd/dist/antd.css";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { StudentContext } from "../../context";
+import { observer } from "mobx-react-lite";
 
-const Add = ({ handleClose,getStudents }) => {
-    const AddStudent = async (data) => {
-        const responce = await axios.post(
-            `https://prod.example.fafu.com.vn/employee`,
-            {
-                username: data.username,
-                firstname: data.firstname,
-                lastname: data.lastname,
-                email: data.email,
-                phone: data.phone,
-                address: data.address,
-                birthday: data.birthday,
-                gender: data.gender,
-            }
-        );
-        if(responce.status ===200){
-            getStudents();
-        }
-    };
+const Add = observer(({ handleClose }) => {
+    const {userDetailStore}= useContext(StudentContext)
     const onFinish = (fieldsValue) => {
         const values = {
             ...fieldsValue,
@@ -30,7 +13,7 @@ const Add = ({ handleClose,getStudents }) => {
             gender: fieldsValue["gender"] === "male" ? 1 : 0,
         };
         console.log("value", values);
-        AddStudent(values);
+        userDetailStore.addUser(values);
         handleClose();
     };
 
@@ -171,6 +154,6 @@ const Add = ({ handleClose,getStudents }) => {
             </div>
         </div>
     );
-};
+});
 
 export default Add;

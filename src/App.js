@@ -1,14 +1,9 @@
 import Home from "./pages/Home";
 import { Routes, Route } from "react-router-dom";
-import Detail from "./pages/Detail/Detail";
-import {provider} from "react-ioc"
-import UserModalViewStore from "./store/UserModalViewStore";
-import UserApi from "./store/UserAPI";
-import UsersDataStore from "./store/UsersDataStore";
-import UserDetailsDataStore from "./store/UserDetailsDataStore";
-import UserDetailsLocationStore from "./store/UserDetailsLocationStore";
+import Detail from "./pages/DetailUser/Detail";
 
-const App=provider(UserModalViewStore,UserApi,UsersDataStore, UserDetailsDataStore, UserDetailsLocationStore)(()=> {
+
+const App= ()=> {
     return (
         <div className="App">
             <Routes>
@@ -17,6 +12,6 @@ const App=provider(UserModalViewStore,UserApi,UsersDataStore, UserDetailsDataSto
             </Routes>
         </div>
     );
-})
+}
 
 export default App;

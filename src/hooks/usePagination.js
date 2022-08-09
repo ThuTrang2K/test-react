@@ -95,3 +95,64 @@ export default function usePagination({ page, setPage, data }) {
         pages,
     };
 }
+
+{/* <div className="mt-5 mb-5 text-center">
+                <nav aria-label="Page navigation example d-inline ">
+                    <ul className="pagination justify-content-center">
+                        <button
+                            className="page-link"
+                            onClick={() => {
+                                setCurentPage(curentPage-1);
+                                setSearchParams({page: curentPage-1})}}
+                            disabled={curentPage === 0 ? true : false}
+                        >
+                            Previous
+                        </button>
+                        {new Array(total_page).fill(0).map((item, index) => (
+                            <li
+                                
+                                class={`page-link ${
+                                    curentPage === index ? "active" : ""
+                                }`}
+                                onClick={() => {
+                                    setCurentPage(index);
+                                    setSearchParams({page: index})}}
+                            >
+                                {index + 1}
+                            </li>
+                        ))}
+                        <button
+                            className="page-link"
+                            onClick={() => {
+                                setCurentPage(curentPage+1);
+                                setSearchParams({page: curentPage+1})}}
+                            disabled={curentPage === total_page - 1 ? true : false}
+                        >
+                            Next{" "}
+                        </button>
+                    </ul>
+                </nav>
+            </div> */}
+
+            //     const getSingleStudent = async (idStudent) => {
+//         const response = await axios.get(
+//             `https://prod.example.fafu.com.vn/employee/${idStudent}`
+//         );
+//         const result = response.data;
+// 
+//         result.gender = result.gender === 1 ? "male" : "female";
+//         console.log("bitrh1", result.birthday);
+//         result.birthday = new Date(result.birthday).toISOString().slice(0,10);
+//         console.log("bitrh2", result.birthday);
+//         setData(result);
+//         form.setFieldsValue({
+//             username: result.username,
+//             firstname: result.firstname,
+//             lastname: result.lastname,
+//             address: result.address,
+//             email: result.email,
+//             birthday: moment(result.birthday, 'YYYY-MM-DD'),
+//             phone: result.phone,
+//             gender: result.gender,
+//         });
+//     };

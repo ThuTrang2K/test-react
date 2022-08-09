@@ -1,19 +1,23 @@
+import axios from 'axios';
 import { makeAutoObservable, runInAction } from 'mobx';
-import { inject } from 'react-ioc';
-import UserApi from './UserAPI';
 
 class UsersDataStore  {
-    UserApi = inject(this, UserApi)
-    response=[];
+    usersList=[];
+    totaPage=0;
+    total =0;
+
     constructor() {
-        console.log('Created: UserDataStore');
-        makeAutoObservable(this, undefined,{autoBind:true})
-        this.read();
+        makeAutoObservable(this)
     }
-    async read() {
-        const response =await this.UserApi.getUsers()
+    async getUsers(page=0) {
+        const response =await axios.get(
+                `https://prod.example.fafu.com.vn/employee?page=${page}&size=10`
+            );
         runInAction(()=>{
-            this.response = response;
+            console.log(response.data);
+            this.usersList = response.data.data;
+            this.totaPage= response.data.total_page;
+            this.total= response.data.total_count
         })
     }
 };

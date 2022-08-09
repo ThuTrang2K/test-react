@@ -1,94 +1,61 @@
-import { makeAutoObservable, runInAction } from 'mobx';
-import React from 'react';
-import { inject } from 'react-ioc';
-import UserApi from './UserAPI';
-import UserDetailsLocationStore from './UserDetailsLocationStore';
+import axios from "axios";
+import { makeAutoObservable, runInAction } from "mobx";
 
-class UserDetailsDataStore  {
-    locationStore = inject(this, UserDetailsLocationStore)
-    user
-    userApi= inject(this,UserApi)
-
-    state ={
-        loading: false,
-        error:'',
-        response:null
+class UserDetailsDataStore {
+    user = {};
+    constructor() {
+        makeAutoObservable(this, undefined, { autoBind: true });
+    }
+    async getUserById(id) {
+        const response = await axios.get(
+            `https://prod.example.fafu.com.vn/employee/${id}`
+        );
+        runInAction(() => {
+            response.data.gender =
+                response.data.gender === 1 ? "male" : "female";
+            response.data.birthday = new Date(response.data.birthday)
+                .toISOString()
+                .slice(0, 10);
+            this.user = response.data;
+        });
     }
 
-    constructor(){
-        makeAutoObservable(this,undefined,{autoBind:true})
-        this.read();
-    }
-
-    get loading(){
-        return this.state.loading;
-    }
-
-    get error(){
-        return this.state.error
-    }
-
-    get userDetails(){
-        return this.state.response
-    }
-
-    async read(){
-        this.state.response= null;
-        this.state.loading = true;
-        this.state.error ='';
-        try {
-            const response = await this.userApi.getUserDetails(this.locationStore.getId)
-            runInAction(()=>{
-                this.state.response = response.data;
-                this.state.loading = false;
+    async addUser(data){
+        return await axios.post(
+            `https://prod.example.fafu.com.vn/employee`,
+            {
+                username: data.username,
+                firstname: data.firstname,
+                lastname: data.lastname,
+                email: data.email,
+                phone: data.phone,
+                address: data.address,
+                birthday: data.birthday,
+                gender: data.gender,
             })
-        }
-        catch(e){
-            runInAction(()=>{
-                this.state.error = 'Connection problem...'
-                this.state.loading= false
-            })
-        }
     }
     
-    async deleteUser(){
-        this.state.response= null;
-        this.state.loading = true;
-        this.state.error ='';
-        try {
-            await this.userApi.deleteUser(this.locationStore.getId)
-            runInAction(()=>{
-                this.state.loading = false;
-            })
-            return true
-        }
-        catch(e){
-            runInAction(()=>{
-                this.state.error = 'Connection problem...'
-                this.state.loading= false
-            })
-            return false
-        }
+    async deleteUser(id){
+        return await axios.delete(
+            `https://prod.example.fafu.com.vn/employee/${id}`
+        )
     }
-    async updateUser(data){
-        this.state.response= null;
-        this.state.loading = true;
-        this.state.error ='';
-        try {
-            await this.userApi.UpdateUser(data, this.locationStore.getId)
-            runInAction(()=>{
-                this.state.loading = false;
-            })
-            return true
-        }
-        catch(e){
-            runInAction(()=>{
-                this.state.error = 'Connection problem...'
-                this.state.loading= false
-            })
-            return false
-        }
+
+    async UpdateUser(data,id){
+        return await axios.put(
+            `http://prod.example.fafu.com.vn/employee/${id}?`,
+            {
+                username: data.username,
+                firstname: data.firstname,
+                lastname: data.lastname,
+                email: data.email,
+                phone: data.phone,
+                address: data.address,
+                birthday: data.birthday,
+                gender: data.gender,
+            }
+        );
     }
-};
+}
 
 export default UserDetailsDataStore;
